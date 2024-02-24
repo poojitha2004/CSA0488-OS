@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <dirent.h>
+
+int main() 
+{
+     int fd = open("example.txt", O_RDWR | O_CREAT, 0644);
+    if (fd == -1) 
+	{
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+    
+    int flags = (fd, 0);
+    if (flags == -1)
+	 {
+        perror("Error getting file flags");
+        exit(EXIT_FAILURE);
+    }
+    printf("File flags: %d\n", flags);
+    off_t offset = lseek(fd, 0, SEEK_END);
+    if (offset == -1)
+	 {
+        perror("Error seeking file");
+        exit(EXIT_FAILURE);
+    }
+     printf("File size: %lld bytes\n", (long long)offset);
+    struct stat file_info;
+    if (stat("example.txt", &file_info) == -1)
+	 {
+        perror("Error getting file information");
+        exit(EXIT_FAILURE);
+    }
+    
+    printf("File permissions: %o\n", file_info.st_mode & 0777);
+    DIR *dir = opendir(".");
+    if (dir == NULL)
+	 {
+        perror("Error opening directory");
+        exit(EXIT_FAILURE);
+    }
+     struct dirent *entry;
+    printf("Contents of current directory:\n");
+    while ((entry = readdir(dir)) != NULL)
+	 {
+        printf("%s\n", entry->d_name);
+    }
+     closedir(dir);
+    close(fd);
+    
+    return 0;
+}
